@@ -1,0 +1,400 @@
+{
+  "components": [
+    {
+      "name": "base",
+      "api": "rdk:component:base",
+      "model": "rdk:builtin:wheeled",
+      "attributes": {
+        "right": [
+          "Right-Motor"
+        ],
+        "wheel_circumference_mm": 250,
+        "width_mm": 400,
+        "left": [
+          "Left-Motor"
+        ]
+      }
+    },
+    {
+      "name": "smooth-base",
+      "api": "rdk:component:base",
+      "model": "aviv:smooth-base:smooth-base",
+      "attributes": {
+        "base_name": "base",
+        "ramp_steps": 10,
+        "step_delay": 0.03
+      },
+      "depends_on": [
+        "base"
+      ]
+    },
+    {
+      "name": "board-1",
+      "api": "rdk:component:board",
+      "model": "viam:raspberry-pi:rpi5",
+      "attributes": {}
+    },
+    {
+      "name": "Right",
+      "api": "rdk:component:encoder",
+      "model": "viam:ams:as5048",
+      "attributes": {
+        "i2c_attributes": {
+          "i2c_bus": "1",
+          "i2c_addr": 65
+        },
+        "connection_type": "i2c"
+      }
+    },
+    {
+      "name": "Left",
+      "api": "rdk:component:encoder",
+      "model": "viam:ams:as5048",
+      "attributes": {
+        "connection_type": "i2c",
+        "i2c_attributes": {
+          "i2c_addr": 64,
+          "i2c_bus": "1"
+        }
+      }
+    },
+    {
+      "name": "Right-Motor",
+      "api": "rdk:component:motor",
+      "model": "rdk:builtin:gpio",
+      "attributes": {
+        "board": "board-1",
+        "dir_flip": true,
+        "pins": {
+          "a": "16",
+          "b": "15"
+        },
+        "encoder": "Right",
+        "ticks_per_rotation": 2,
+        "pwm_freq": 20000
+      }
+    },
+    {
+      "name": "Left-Motor",
+      "api": "rdk:component:motor",
+      "model": "rdk:builtin:gpio",
+      "attributes": {
+        "board": "board-1",
+        "encoder": "Left",
+        "dir_flip": false,
+        "ticks_per_rotation": 2,
+        "pins": {
+          "b": "11",
+          "a": "12",
+          "pwm_freq": 20000
+        }
+      }
+    },
+    {
+      "name": "Lidar",
+      "api": "rdk:component:camera",
+      "model": "viam:lidar:rplidar",
+      "attributes": {
+        "serial_path": "/dev/ttyUSB0"
+      },
+      "service_configs": [
+        {
+          "type": "data_manager",
+          "attributes": {
+            "capture_methods": [
+              {
+                "method": "NextPointCloud",
+                "capture_frequency_hz": 5,
+                "disabled": false,
+                "additional_params": {}
+              }
+            ]
+          }
+        }
+      ],
+      "frame": {
+        "parent": "world",
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 0.8421509228775381
+        },
+        "orientation": {
+          "type": "ov_degrees",
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 1,
+            "th": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "filter",
+      "api": "rdk:component:audio_in",
+      "model": "viam:system-audio:microphone",
+      "attributes": {
+        "num_channels": 1,
+        "sample_rate": 16000
+      }
+    },
+    {
+      "name": "speaker",
+      "api": "rdk:component:audio_out",
+      "model": "viam:system-audio:speaker",
+      "attributes": {}
+    },
+    {
+      "name": "wake-word",
+      "api": "rdk:component:audio_in",
+      "model": "viam:filtered-audio:wake-word-filter",
+      "attributes": {
+        "source_microphone": "filter",
+        "wake_words": [
+          "robot"
+        ]
+      }
+    },
+    {
+      "name": "camera",
+      "api": "rdk:component:camera",
+      "model": "viam:camera:csi-pi",
+      "attributes": {
+        "name": "camera",
+        "api": "rdk:component:camera",
+        "model": "rdk:builtin:webcam",
+        "attributes": {
+          "video_path": "/dev/video0"
+        }
+      }
+    },
+    {
+      "name": "movement_sensor",
+      "api": "rdk:component:movement_sensor",
+      "model": "viam:tdk-invensense:mpu6050",
+      "attributes": {
+        "i2c_bus": "1",
+        "use_alt_i2c_address": false
+      },
+      "depends_on": [
+        "board-1"
+      ],
+      "service_configs": [
+        {
+          "type": "data_manager",
+          "attributes": {
+            "capture_methods": [
+              {
+                "method": "Readings",
+                "capture_frequency_hz": 10,
+                "disabled": false,
+                "additional_params": {}
+              }
+            ]
+          }
+        }
+      ],
+      "frame": {
+        "parent": "world",
+        "translation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "orientation": {
+          "type": "ov_degrees",
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 1,
+            "th": 0
+          }
+        }
+      }
+    },
+    {
+      "name": "arm-1",
+      "api": "rdk:component:arm",
+      "model": "devrel:so101:arm",
+      "attributes": {}
+    },
+    {
+      "name": "gripper-1",
+      "api": "rdk:component:gripper",
+      "model": "devrel:so101:gripper",
+      "attributes": {}
+    },
+    {
+      "name": "sensor-1",
+      "api": "rdk:component:sensor",
+      "model": "devrel:so101:calibration",
+      "attributes": {}
+    }
+  ],
+  "services": [
+    {
+      "name": "discovery-1",
+      "api": "rdk:service:discovery",
+      "model": "devrel:so101:discovery",
+      "attributes": {}
+    },
+    {
+      "name": "mlmodel-1",
+      "api": "rdk:service:mlmodel",
+      "model": "viam:mlmodel-tflite:tflite_cpu",
+      "attributes": {
+        "package_reference": "6efeb7e5-91aa-4187-8ed3-e84764726078/EfficientDet-COCO",
+        "model_path": "${packages.ml_model.EfficientDet-COCO}/effdet0 (3).tflite",
+        "label_path": "${packages.ml_model.EfficientDet-COCO}/effdetlabels.txt"
+      }
+    },
+    {
+      "name": "vision-1",
+      "api": "rdk:service:vision",
+      "model": "rdk:builtin:mlmodel",
+      "attributes": {
+        "default_minimum_confidence": 0.5,
+        "mlmodel_name": "mlmodel-1",
+        "camera_name": "camera"
+      }
+    },
+    {
+      "name": "data_manager-1",
+      "api": "rdk:service:data_manager",
+      "model": "rdk:builtin:builtin",
+      "attributes": {
+        "sync_interval_mins": 0.1,
+        "capture_dir": "",
+        "tags": [],
+        "additional_sync_paths": []
+      }
+    },
+    {
+      "name": "slam-1",
+      "api": "rdk:service:slam",
+      "model": "viam:slam:cartographer",
+      "attributes": {
+        "enable_mapping": true,
+        "use_cloud_slam": false,
+        "existing_map": "",
+        "camera": {
+          "name": "Lidar",
+          "data_frequency_hz": "5"
+        },
+        "config_params": {
+          "mode": "2d",
+          "min_range_meters": ".2",
+          "max_range_meters": "25"
+        }
+      },
+      "service_configs": [
+        {
+          "type": "data_manager",
+          "attributes": {
+            "capture_methods": [
+              {
+                "method": "Position",
+                "capture_frequency_hz": 5,
+                "disabled": false,
+                "additional_params": {}
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "type": "registry",
+      "name": "viam_raspberry-pi",
+      "module_id": "viam:raspberry-pi",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_ams",
+      "module_id": "viam:ams",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_tflite_cpu",
+      "module_id": "viam:tflite_cpu",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam-labs_local-llm",
+      "module_id": "viam-labs:local-llm",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_rplidar",
+      "module_id": "viam:rplidar",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_cartographer",
+      "module_id": "viam:cartographer",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "wootter_vision",
+      "module_id": "wootter:vision",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_system-audio",
+      "module_id": "viam:system-audio",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_filtered-audio",
+      "module_id": "viam:filtered-audio",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_csi-cam-pi",
+      "module_id": "viam:csi-cam-pi",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "viam_tdk-invensense",
+      "module_id": "viam:tdk-invensense",
+      "version": "latest"
+    },
+    {
+      "type": "registry",
+      "name": "devrel_so101-arm",
+      "module_id": "devrel:so101-arm",
+      "version": "latest"
+    },
+    {
+      "type": "local",
+      "name": "local-module-1",
+      "executable_path": "/home/aviv/Documents/Display.py"
+    },
+    {
+      "type": "local",
+      "name": "smooth-base-module",
+      "executable_path": "/home/aviv/smooth_base/run.sh"
+    }
+  ],
+  "packages": [
+    {
+      "name": "EfficientDet-COCO",
+      "package": "6efeb7e5-91aa-4187-8ed3-e84764726078/EfficientDet-COCO",
+      "type": "ml_model",
+      "version": "latest"
+    }
+  ]
+}
