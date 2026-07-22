@@ -27,7 +27,7 @@ A voice-controlled robot built on a Scuttle v3 wheeled base running on a Raspber
 | Adafruit Qualia ESP32-S3 for TTL RGB-666 Displays | https://www.adafruit.com/product/5800 |
 | Round RGB TTL TFT Display - 4" 720x720 (NV3052C) | https://www.adafruit.com/product/5793 |
 | 16x NeoPixel strip | https://www.adafruit.com/product/3919 |
-| AS5048B Magnetic Encoders (x2) | |
+| AS5048B Magnetic Encoders (x2) |AS5048B-TS_EK_AB|
 
 ---
 
