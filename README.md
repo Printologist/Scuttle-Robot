@@ -46,7 +46,7 @@ Download these files and save them to `/home/user/AI-ASSIST/` on your Pi:
 
 | File | Location | Description |
 |---|---|---|
-| `MAIN.py` | `/home/user/AI-ASSIST/MAIN.py` | Main voice assistant code (runs on Pi) |
+| `main.py` | `/home/user/AI-ASSIST/main.py` | Main voice assistant code (runs on Pi) |
 | `eyes_viam.py` | `/home/user/AI-ASSIST/eyes_viam.py` | Eye tracking — sends face gaze coordinates to the Qualia display |
 | `code.py` | Qualia CIRCUITPY drive | CircuitPython code for the round display and NeoPixels (auto-runs on boot) |
 
@@ -105,7 +105,7 @@ Make sure Thonny is **closed**, then run both scripts in two separate terminals:
 
 **Terminal 1:**
 ```bash
-python3 /home/user/AI-ASSIST/MAIN.py
+python3 /home/user/AI-ASSIST/main.py
 ```
 
 **Terminal 2:**
@@ -142,7 +142,7 @@ If your Pi SD card dies, you need to restore:
 1. Re-flash Pi OS and reinstall viam-agent (your Viam config is safe in the cloud)
 2. Reinstall Python dependencies (Step 2 above)
 3. Restore these files from backup:
-   - `MAIN.py`
+   - `main.py`
    - `eyes_viam.py`
 4. Re-enter your credentials in both files
 5. `code.py` is safe — it lives on the Qualia's own flash memory
